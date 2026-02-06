@@ -1,5 +1,8 @@
 extends CharacterBody3D
 
+@onready var hit_player
+@onready var health = 1
+
 @onready var nav_agent = $NavigationAgent3D
 var SPEED = 3.0
 const JUMP_VELOCITY = 4.5
@@ -7,6 +10,7 @@ const JUMP_VELOCITY = 4.5
 # Get the gravity from the project settings to be synced with RigidBody nodes.
 var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
 
+signal health_changed(health_value)
 
 func update_target_location (target_location):
 	nav_agent.set_target_position(target_location)
@@ -22,3 +26,19 @@ func _physics_process(delta):
 	velocity = new_veloicty
 	
 	move_and_slide()
+
+func enemydamage():
+	health -= 1
+	if health <= 0:
+		health = 3
+		position = Vector3.ZERO
+	health_changed.emit(health)
+
+
+func _on_health_changed(health_value):
+	health-= 1
+	if health <= 0:
+		health = 3
+		position = Vector3.ZERO
+	health_changed.emit(health)
+	
